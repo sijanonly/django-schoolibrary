@@ -1,58 +1,93 @@
-# -*- coding: utf-8 -*-
+"""Application URL."""
 from django.conf.urls import url
-from django.views.generic import TemplateView
+from libraryapp.admin_views import (
+    LibraryBookView, LibraryListingView,
+    LibraryBookIssueView,
+    LibraryBookReturnView,
+    PrintBarCodes)
 
-from . import views
+from libraryapp.api import (
+    BookPost, BookList, BookDetail,
+    BookDetailByBarcode,
+    BookIssuePost,
+    BookIssuesByStudent,
+    BookBarcodes,
+    BookIssueUpdate,
+    BookIssueByBarcode,
+    StudentBookFines,
+    BookTypeList)
+
+from library.views import (
+    LibrarySearchBookView
+)
+
 
 urlpatterns = [
+
     url(
-        regex="^User/~create/$",
-        view=views.UserCreateView.as_view(),
-        name='User_create',
+        r'search/$',
+        LibrarySearchBookView.as_view(),
+        name='search-book'
     ),
+
     url(
-        regex="^User/(?P<pk>\d+)/~delete/$",
-        view=views.UserDeleteView.as_view(),
-        name='User_delete',
+        r'^print_barcodes/$',
+        PrintBarCodes.as_view(),
+        name='print_book_barcodes'
     ),
+
+
     url(
-        regex="^User/(?P<pk>\d+)/$",
-        view=views.UserDetailView.as_view(),
-        name='User_detail',
-    ),
+        r'add/$',
+        LibraryBookView.as_view(),
+        name='add'),
+
     url(
-        regex="^User/(?P<pk>\d+)/~update/$",
-        view=views.UserUpdateView.as_view(),
-        name='User_update',
-    ),
+        r'listing/$',
+        LibraryListingView.as_view(),
+        name='listing'),
+
     url(
-        regex="^User/$",
-        view=views.UserListView.as_view(),
-        name='User_list',
-    ),
-	url(
-        regex="^Book/~create/$",
-        view=views.BookCreateView.as_view(),
-        name='Book_create',
-    ),
+        r'issue/$',
+        LibraryBookIssueView.as_view(),
+        name='issue'),
+
     url(
-        regex="^Book/(?P<pk>\d+)/~delete/$",
-        view=views.BookDeleteView.as_view(),
-        name='Book_delete',
-    ),
+        r'return/$',
+        LibraryBookReturnView.as_view(),
+        name='return'),
+
     url(
-        regex="^Book/(?P<pk>\d+)/$",
-        view=views.BookDetailView.as_view(),
-        name='Book_detail',
-    ),
+        r'^api/book/post/$',
+        BookPost.as_view(),
+        name='book-post'),
+
     url(
-        regex="^Book/(?P<pk>\d+)/~update/$",
-        view=views.BookUpdateView.as_view(),
-        name='Book_update',
-    ),
+        r'^api/book/list/$',
+        BookList.as_view(),
+        name='book-list'),
+
     url(
-        regex="^Book/$",
-        view=views.BookListView.as_view(),
-        name='Book_list',
+        r'^api/book-type/list/$',
+        BookTypeList.as_view(),
+        name='book-type-list'),
+
+    url(
+        r'^api/book/update/(?P<pk>[0-9]+)$',
+        BookDetail.as_view(),
+        name='book-detail'
     ),
-	]
+
+    url(
+        r'^api/book/update_barcodes/$',
+        BookBarcodes.as_view(),
+        name='book_barcodes'
+    ),
+
+    url(
+        r'^api/book/(?P<barcode>[-\w]+)$',
+        BookDetailByBarcode.as_view(),
+        name='book_detail'
+    ),
+
+]

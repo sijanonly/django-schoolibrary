@@ -1,0 +1,218 @@
+{% extends "dashboard/dashboard_base.html" %} {% load staticfiles i18n %} {% load i18n %} {% load crispy_forms_tags %} {% block head_title %}{% trans "Add Book" %}{% endblock %} {% block css %} {{ block.super }}
+<link href="{% static 'css/jquery-ui.min.css' %}" rel="stylesheet">
+<link href="{% static 'css/nepali.datepicker.v2.min.css' %}" rel="stylesheet">
+<link href="{% static 'css/calendar/angular-bootstrap-calendar.min.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+<link href="{% static 'js/bower_components/tags/ng_tags_input.min.css' %}" rel="stylesheet">
+<style type="text/css">
+.row-content {
+    margin: 0px auto;
+    /*padding: 20px 0px;*/
+    min-height: 400px;
+}
+
+.span4 {
+    margin-top: 20px;
+    min-height: 150px;
+}
+</style>
+{% endblock %} {% block all_content %}{% verbatim %}
+<div class="row row-content" ng-app='bookApp'>
+    <div class="col-sm-12 book-container" style="margin-top: 2%;" ng-controller="BookAddController">
+        <div class=" row" style="margin-bottom:12px;">
+            <div class="col-sm-3">
+                <label style="font-size:25px;" class="control-label">Add Book</label>
+            </div>
+            <div class="col-sm-5 ">
+            <flash-message duration="5000" show-close="true"></flash-message>
+            </div>
+             {% endverbatim %}
+                    <div class="col-sm-4 pull-right">
+                   
+                        
+                    </div>
+            {% verbatim %}
+        </div>
+        <hr>
+        <form class="form-horizontal" name="bookForm" ng-submit="addBook()" novalidate>
+            <ul class="nav nav-tabs">
+                <li ng-repeat="step in steps" ng-class="{active: $index==getCurrentStepIndex()}">
+                    <a href="javascript:void(0)" ng-click="goToStep($index)">{{step}}</a>
+                </li>
+            </ul>
+            <div ng-switch on="selection">
+                <!-- First Step -->
+                <div ng-switch-when="Step 1: Book Info">
+                    <div class="row">
+                        <div class="span4">
+                            <div class="form-group">
+                                <label for="title" class="col-sm-2 control-label">Title</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="id_book_title" placeholder="Book Name" ng-model="book.title" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="subject" class="col-sm-2 control-label">Subject</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="id_book_subject" placeholder="Subject" ng-model="book.subject" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="isbn" class="col-sm-2 control-label">ISBN</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="id_book_isbn" placeholder="ISBN" ng-model="book.isbn" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="edition" class="col-sm-2 control-label">Edition</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="id_book_edition" placeholder="Book Edition" ng-model="book.edition" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_book_class" class="col-sm-2 control-label">Book Class</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="id_book_class" placeholder="Book Class" ng-model="book.book_class" >
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input ng-init="book.availability=false" type="checkbox" checked ng-model="book.availability" > Available
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Second Step -->
+                <div ng-switch-when="Step 2: Publisher Info">
+                    <div class="row">
+                        <div class="span4">
+                            <div class="form-group">
+                                <label for="publisher name" class="col-sm-2 control-label">Publisher Name</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="id_publisher_name" placeholder="Publisher Name" ng-model="publisher.name" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="publication place" class="col-sm-2 control-label">Publication Year</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="id_book_publication_year" placeholder="Publication Year"
+                                    ng-model="publisher.publication_year" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="publication place" class="col-sm-2 control-label">Publication Place</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="id_book_publication_place" placeholder="Publication Place"
+                                    ng-model="publisher.publication_place" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div ng-switch-when="Step 3: Authors Info">
+                    <div class="row">
+                        <div class="span4">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <button type="button" class="btn btn-block btn-info" ng-click="addField()">Add Author</button>
+                                </div>
+                            </div>
+                            <div style="margin-top:5px;" class="form-group" ng-repeat="item in authors">
+                                <div class="row">
+                                <label for="Author Name" class="col-sm-2 control-label">Author Name</label>
+                                <div class="col-sm-4">
+                                    <input ng-model="item.name" class="form-control" placeholder="author name">
+                                </div>
+                                    <button class="col-sm-1" ng-click="removeField($index)">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Third Step -->
+                <div ng-switch-when="Step 4: Extra Info">
+                    <div class="row">
+                        <div class="span4">
+                             <div class="form-group">
+                                <label for="id_language" class="col-sm-2 control-label">Book Language</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="id_book_language" placeholder="Book Language" ng-model="book.language">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="subject" class="col-sm-2 control-label">Book Type</label>
+                                <div class="col-sm-4">
+                                     <select class="form-control" id="book_type" name="book_type" ng-options="item as item.name for item in book_types track by item.id" ng-model="book.book_type">
+                        <option value="">Select</option>
+                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="Number of pages" class="col-sm-2 control-label">Number of pages</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="id_page_numbers" placeholder="Number of pages" ng-model="book.number_of_pages" >
+                                </div>
+                            </div>
+                             <div class="form-group">
+                                <label for="Number of pages" class="col-sm-2 control-label">Number of copies</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="id_page_numbers" placeholder="Number of Copies" ng-model="book.number_of_copies">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="publication place" class="col-sm-2 control-label">Keywords</label>
+                                <div class="col-sm-4">
+                                <tags-input ng-model="tags"  required></tags-input>
+                                <small>Use commas : management, account</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix">
+                            
+                        </div>
+                        <div class="pull-right col-sm-5">
+                <button style="margin:20px 0;" class="btn btn-success" ng-disabled="bookForm.$invalid" type="submit" >Add Book</button>
+            </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="clearfix"></div>
+            <ul class="pager pull-left">
+                <li class="" ng-class="{disabled: !hasPreviousStep()}">
+                    <a href="javascript:void(0);" ng-click="decrementStep()">&larr; Previous Step</a>
+                </li>
+                <li class="" ng-class="{disabled: !hasNextStep()}">
+                    <a href="javascript:void(0);" ng-click="incrementStep()">Next Step &rarr;</a>
+                </li>
+            </ul>
+            
+            <div class="clearfix"></div>
+        </form>
+    </div>
+</div>
+{% endverbatim %} {% endblock %} {% block javascript %} {{ block.super }}
+<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+<script src="{% static 'js/application/nepali.datepicker.v2.min.js' %}"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.1/underscore-min.js"></script>
+<script type="text/javascript">
+var csrf_token = '{{ csrf_token|escapejs }}';
+</script>
+<script src="{% static 'js/bower_components/angular-flash/angular-flash.min.js' %}"></script>
+
+<script src="{% static 'js/calendar/ui-bootstrap-tpls.min.js' %}"></script>
+
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-sanitize.js"></script>
+<script src="{% static 'js/bower_components/ui-select/dist/select.min.js' %}"></script>
+<link href="{% static 'js/bower_components/ui-select/dist/select.min.css' %}" rel="stylesheet">
+<script src="{% static 'js/bower_components/tags/ng_tags_input.min.js' %}"></script>
+
+<script src="{% static 'js/library/app.js' %}"></script>
+<script src="{% static 'js/library/services.js' %}"></script>
+<script src="{% static 'js/library/controllers.js' %}"></script>
+{% endblock javascript %}
